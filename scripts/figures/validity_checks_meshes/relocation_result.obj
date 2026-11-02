@@ -1,0 +1,33 @@
+# Fig. validity-checks, relocation, after the edit. v at the top of a dome moves the full step to its tangential target p_v', past the dent at r3: (v, r2, r3) and (v, r3, r4) turn over.
+# Stored as (x, z, -y): import into Blender with the default axes (forward -Z, up Y).
+o relocation_result
+# vertex r1
+v 1.100000 0.121622 0.000000
+# vertex r2
+v 0.900000 0.035137 -0.900000
+# vertex r3
+v 0.000000 0.170000 0.250000
+# vertex r4
+v -0.900000 0.035137 -0.900000
+# vertex r5
+v -1.100000 0.121622 0.000000
+# vertex r6
+v -0.550000 0.324461 0.900000
+# vertex r7
+v 0.550000 0.324461 0.900000
+# vertex v
+v 0.000000 0.347646 0.003805
+# face v-r1-r2
+f 8 1 2
+# face v-r2-r3
+f 8 2 3
+# face v-r3-r4
+f 8 3 4
+# face v-r4-r5
+f 8 4 5
+# face v-r5-r6
+f 8 5 6
+# face v-r6-r7
+f 8 6 7
+# face v-r7-r1
+f 8 7 1

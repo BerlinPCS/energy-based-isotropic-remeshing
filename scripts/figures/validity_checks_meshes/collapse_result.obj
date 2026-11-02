@@ -1,0 +1,33 @@
+# Fig. validity-checks, collapse, after the edit. Edge vw on a ridge collapses to its midpoint m, which lies beyond the edge p1 p2 opposite v, so (v, p1, p2) turns over.
+# Stored as (x, z, -y): import into Blender with the default axes (forward -Z, up Y).
+o collapse_result
+# vertex m
+v 0.850000 0.500000 0.000000
+# vertex p1
+v 0.400000 0.125000 -0.320000
+# vertex p2
+v 0.050000 0.202777 -0.950000
+# vertex p3
+v -1.000000 0.182109 -0.100000
+# vertex p4
+v -0.450000 0.181655 0.900000
+# vertex q1
+v 2.600000 0.221874 -0.050000
+# vertex q2
+v 2.000000 0.221874 -0.850000
+# vertex q3
+v 2.100000 0.189542 0.900000
+# face m-p1-p2
+f 1 2 3
+# face m-p2-p3
+f 1 3 4
+# face m-p3-p4
+f 1 4 5
+# face m-p4-q3
+f 1 5 8
+# face m-q3-q1
+f 1 8 6
+# face m-q1-q2
+f 1 6 7
+# face m-q2-p1
+f 1 7 2

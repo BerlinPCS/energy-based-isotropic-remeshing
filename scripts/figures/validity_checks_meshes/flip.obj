@@ -1,0 +1,15 @@
+# Fig. validity-checks, flip, before the edit. Edge ab on a ridge, in a quad that is not convex at a (seen along n): the new triangle dca turns over.
+# Stored as (x, z, -y): import into Blender with the default axes (forward -Z, up Y).
+o flip
+# vertex a
+v 1.000000 0.470000 0.000000
+# vertex b
+v 2.400000 0.540000 0.000000
+# vertex c
+v 0.000000 0.021000 -0.950000
+# vertex d
+v 0.100000 0.026000 0.950000
+# face a-b-c
+f 1 2 3
+# face b-a-d
+f 2 1 4
