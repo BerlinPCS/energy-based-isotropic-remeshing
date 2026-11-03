@@ -8,7 +8,7 @@ random (fixed seed) and do not show measured operation mixes. The end of each ro
 
 import random
 
-from common.style import define_color
+from shared.style import define_color
 
 COLORS = {"split": "D77D43", "collapse": "35A39E", "flip": "6B7FD7", "relocation": "9AA3AB"}
 CELL = 0.17  # width of one phase cell, cm
@@ -36,8 +36,8 @@ class Row:
 
 ROWS = [
     Row("Baseline", r"$k$ cycles").cycles(5),
-    Row("Convergent repetition", "stagnation").cycles(8),
-    Row("Ordered phases", "stagnation").cycles(8, sorted_phases=True),
+    Row("Repeated cycles", "stagnation").cycles(8),
+    Row("Repeated ordered cycles", "stagnation").cycles(8, sorted_phases=True),
     Row("Dynamic queue", "no improving candidate").queue(6.2),
     Row("Batched processing", "no improving candidate").batch(4, 1.35),
     Row("Hybrid", "no improving candidate").cycles(2).queue(4.6),

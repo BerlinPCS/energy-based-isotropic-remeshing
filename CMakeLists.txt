@@ -76,7 +76,3 @@ target_link_libraries(mesh-screenshot PRIVATE visuals)
 add_executable(viewer apps/viewer/main.cpp)
 target_include_directories(viewer PRIVATE "${polyscope_SOURCE_DIR}/deps/json/include")
 target_link_libraries(viewer PRIVATE visuals)
-
-# mesh_preparation/prepare_meshes.py: not part of the default build.
-add_executable(fill-holes EXCLUDE_FROM_ALL mesh_preparation/fill_holes.cpp)
-target_link_libraries(fill-holes PRIVATE pmp)

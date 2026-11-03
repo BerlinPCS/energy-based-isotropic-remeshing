@@ -1,6 +1,5 @@
-# elk.obj: cleaned from elk.off by scripts/clean_benchmark_meshes.py
-# removed 0 isolated vertices, 0 degenerate and 0 duplicate faces; collapsed 0 edges < 0 x mean edge length; flipped 0 cap edges (angle > 180 deg)
-# p_out = (p_in - (23.890699, -0.9191475, -23.3442515)) * 0.0125292009
+# elk.obj: elk from the CGAL sample meshes (see README),
+# centered and scaled so that the longest side of its bounding box is 2 (thesis App. A):
 v 0.21759338 -0.463809137 0.916975275
 v 0.239286426 -0.642583293 0.910173172
 v 0.353055379 -0.562339988 0.766825318

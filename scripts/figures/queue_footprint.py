@@ -16,7 +16,7 @@ edits, with v as the only anchor:
 
 from math import cos, sin, sqrt
 
-from common.style import define_color
+from shared.style import define_color
 
 RINGS = 2
 SCALE = 0.62  # cm per lattice unit

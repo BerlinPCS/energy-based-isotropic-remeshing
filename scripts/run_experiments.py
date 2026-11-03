@@ -47,7 +47,7 @@ SAFETY_CAP_SECONDS = 900
 
 def main_comparison():
     yield {'approach': 'baseline'}
-    yield {'approach': 'convergent'}
+    yield {'approach': 'repeated'}
     yield {'approach': 'ordered'}
     for approach in QUEUE_APPROACHES:
         for objective in OBJECTIVES:
@@ -151,9 +151,18 @@ def run_input_order(cli, meshes_dir, out_dir, meshes):
             reordered.unlink()
 
 
+def count_elements(path):
+    vertices = faces = 0
+    with open(path) as file:
+        for line in file:
+            vertices += line.startswith('v ')
+            faces += line.startswith('f ')
+    return vertices, faces, faces * 3 // 2
+
+
 def knee_trace_interval(input_mesh):
     """A divisor of the knee window K of Sec. 3.2.3, so that the trace has a row at every window boundary."""
-    vertices, _, edges = scan_meshes.count_elements(input_mesh)
+    vertices, _, edges = count_elements(input_mesh)
     window = max(50, (vertices + edges) // 50)
     divisors = [d for d in range(1, window // 8 + 1) if window % d == 0]
     return max(divisors) if divisors else 1

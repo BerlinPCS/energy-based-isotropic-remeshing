@@ -1,6 +1,5 @@
-# homer.obj: cleaned from homer.obj by scripts/clean_benchmark_meshes.py
-# removed 0 isolated vertices, 0 degenerate and 0 duplicate faces; collapsed 0 edges < 0 x mean edge length; flipped 0 cap edges (angle > 180 deg)
-# p_out = (p_in - (0.4991625, 0.576353, 0.4923285)) * 2.37981347
+# homer.obj: Homer from Common 3D Test Models (see README),
+# centered and scaled so that the longest side of its bounding box is 2 (thesis App. A)
 v 0.547127446 0.115737468 0.285462195
 v 0.251623628 0.062655729 -0.0361243786
 v 0.437070592 0.118048267 0.236126282

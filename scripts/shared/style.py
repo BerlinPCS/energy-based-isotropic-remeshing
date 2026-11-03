@@ -18,6 +18,11 @@ MESH_NAMES = {
     'rocker-arm': 'Rocker arm', 'homer': 'Homer', 'elk': 'Elk',
 }
 
+# The symbols of Sec. 4.1 as table headers; the captions say what they measure.
+LOSS_SYMBOL, TIME_SYMBOL = r'$\bar\lambda$', '$t$'
+MIN_ANGLE_SYMBOL, ANGLE_TAIL_SYMBOL = r'$\theta_{\min}$', r'$\theta_{5\%}$'
+VALENCE_SYMBOL, DEVIATION_SYMBOL = r'$\sigma_{\mathrm{val}}$', r'$d_{\mathrm{RMS}}$'
+
 # The colours of the schematic figures, as LaTeX defines them.
 PALETTE = {
     'opInk': '303C44', 'opNeutral': 'F1F4F5', 'opBefore': 'D77D43', 'opBeforeFill': 'FAEADD', 'opOperand': '9E3C12',

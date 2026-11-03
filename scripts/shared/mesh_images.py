@@ -1,12 +1,10 @@
-"""The mesh images of the thesis: captures with mesh-screenshot, composed into figures. Used by generate_results.py.
+"""What the mesh images of Ch. 1 and 4 share: captures with mesh-screenshot, composed into a grid of panels.
 
 All panels of a figure share the camera and the image-space crop, the union of their non-background pixels, so that they
 stay aligned and little white background is left.
 """
-import json
 import tempfile
 from pathlib import Path
-from types import SimpleNamespace
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -17,10 +15,10 @@ from matplotlib.patches import FancyArrowPatch
 from PIL import Image
 
 import scan_meshes
-from common import render
-from common.style import TEXT_WIDTH_POINTS
+from shared import render
+from shared.style import TEXT_WIDTH_POINTS
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 POINT = 1 / 72.27
 WIDTH = TEXT_WIDTH_POINTS * POINT
 DPI = 600
@@ -28,29 +26,6 @@ IMAGE_STYLE = {'font.family': 'serif', 'font.serif': ['STIX Two Text', 'STIXGene
                'mathtext.fontset': 'stix', 'pdf.fonttype': 42}
 LONG_EDGE, SHORT_EDGE = (.10, .75, .20), (0, .80, .95)  # the out-of-band edge colours of apps/shared/src/visuals.cpp
 
-CAMERAS = {
-    'elk': render.camera([0.272816181182861, 0.307888865470886, 0.149749398231506],
-                         [-0.997762441635132, 0.0, -0.0668581500649452, 0.282217770814896, -0.030678553506732,
-                          0.888508439064026, 0.457833617925644, -0.333752542734146, 0.0594040341675282,
-                          0.458860337734222, -0.886520445346832, -2.42347693443298, 0.0, 0.0, 0.0, 1.0]),
-    'bunny-detail': render.camera([-0.0314967632293701, -0.188708603382111, -0.045610785484314],
-                                  [0.619214057922363, 0.0, -0.785222172737122, -0.0163111686706543, 0.168047860264778,
-                                   0.976830720901489, 0.132519945502281, 0.195673689246178, 0.767029225826263,
-                                   -0.214013129472733, 0.604867398738861, -2.29503417015076, 0.0, 0.0, 0.0, 1.0]),
-    'bunny-head': render.camera([-.62, .37, 0], [1, 0, 0, .62, 0, 1, 0, -.37, 0, 0, 1, -1.2, 0, 0, 0, 1]),
-    'rocker-arm': render.camera([-0.026951789855957, 0.0627247095108032, 0.176916003227234],
-                                [0.356904417276382, 0.0, 0.934140861034393, -0.155645221471786, -0.474825650453568,
-                                 0.861178874969482, 0.181415215134621, -0.0989099442958832, -0.804462432861328,
-                                 -0.508301973342896, 0.30735856294632, -1.72133219242096, 0.0, 0.0, 0.0, 1.0]),
-    'horse-cap': render.camera([0.0764657258987427, -0.216618105769157, 0.0790727734565735],
-                               [0.143999367952347, 0.0, -0.989577829837799, 0.0672376453876495, -0.00477570295333862,
-                                0.999988436698914, -0.000694941030815244, 0.217035740613937, 0.989566266536713,
-                                0.00482600042596459, 0.143997684121132, -0.504755198955536, 0.0, 0.0, 0.0, 1.0]),
-    'max-planck': render.camera([0.13323563337326, -0.0250874683260918, -0.197578847408295],
-                                [0.697087049484253, 0.0, -0.71698659658432, -0.23453825712204, -0.0854687839746475,
-                                 0.992869675159454, -0.0830966457724571, 0.0198779292404652, 0.711874186992645,
-                                 0.119205549359322, 0.692116498947144, -0.99624502658844, 0.0, 0.0, 0.0, 1.0]),
-}
 # Vertex mean of the loss over [0, 0.12], wireframe width 0.8 (1 in the viewers reads too dark).
 STYLE = ['--coloring', 'vertex', '--colormap', 'coolwarm', '--range', '0,0.12', '--edge-width', '0.8']
 BAND = ['--coloring', 'vertex', '--colormap', 'magma_r', '--range', '0,0.12', '--edge-width', '0.8', '--out-of-band']
@@ -90,12 +65,13 @@ class Panel:
         self.loss, self.deviation = float(row.average_edge_loss), float(row.d_rms)
 
 
-def capture(panels, camera, options, out, crop=None):
-    """Sets panel.image for all panels. crop: (x0, y0, x1, y1) as fractions of the screenshot, before the shared crop."""
+def capture(panels, camera, options, crop=None):
+    """Sets panel.image for all panels. camera: the JSON of render.camera(). crop: (x0, y0, x1, y1) as fractions of the
+    screenshot, before the shared crop."""
     with tempfile.TemporaryDirectory() as temporary:
         for index, panel in enumerate(panels):
             path = Path(temporary) / f'{index}.png'
-            render.screenshot(panel.source, path, ['--camera', CAMERAS[camera], *options], panel.target_length)
+            render.screenshot(panel.source, path, ['--camera', camera, *options], panel.target_length)
             panel.image = (plt.imread(path)[..., :3] * 255).round().astype(np.uint8)
     if crop:
         height, width = panels[0].image.shape[:2]
@@ -208,125 +184,5 @@ def grid(path, cells, columns, colormap, titles=None, below=None, column_titles=
                                 Line2D([], [], color=SHORT_EDGE, lw=1.6, label=r'$<\frac{4}{5}\ell_*$')],
                        loc='center left', bbox_to_anchor=(1.06, .5), frameon=False, fontsize=6.5, handlelength=1.3,
                        ncol=2, columnspacing=1, borderaxespad=0)
-        fig.savefig(path)
+        fig.savefig(path, dpi=DPI)
         plt.close(fig)
-
-
-def bunny_iterations(data, runs, out):
-    """Fig. iteration-comparison: the same cycle count leaves two targets at different stages of convergence."""
-    targets, cycles = [1.0, 1.5], [1, 5, 25]
-    panels = [Panel(data, runs, 'stanford-bunny', t, 'baseline', cycles=k) for t in targets for k in cycles]
-    capture(panels, 'bunny-head', [*BAND, '--size', '900x700'], out)
-    grid(out / 'views-bunny-iterations.pdf', panels, 3, 'magma_r',
-         below=[rf'{loss_text(p)}, ${p.outside:.1f}\%$ outside band' for p in panels],
-         column_titles=[f'$k = {k}$' for k in cycles], row_titles=[f'$T = {t:g}$' for t in targets], band=True,
-         row_title_width=26 * POINT)
-
-
-def bunny_queue_objectives(data, runs, out):
-    targets = [0.75, 1.0, 1.5]
-    configurations = [('baseline', ''), *(('dynamic-queue', o) for o in ['sum', 'maximum', 'local-average', 'global-average'])]
-    panels = [Panel(data, runs, 'stanford-bunny', t, a, o) for a, o in configurations for t in targets]
-    capture(panels, 'bunny-detail', BAND, out)
-    grid(out / 'views-bunny-queue-objectives-4x3.pdf', panels, 3, 'magma_r', below=[loss_text(p) for p in panels],
-         column_titles=[f'$T = {t:g}$' for t in targets], row_titles=['(a)', '(b)', '(c)', '(d)', '(e)'], band=True,
-         max_height=540 * POINT)
-
-
-def rocker_arm_objectives(data, runs, out):
-    names = {'sum': 'Dynamic / sum', 'global-average': 'Dynamic / global avg.'}
-    configurations = [(o, t) for o in names for t in [0.75, 1.0]]
-    panels = [Panel(data, runs, 'rocker-arm', t, 'dynamic-queue', o) for o, t in configurations]
-    capture(panels, 'rocker-arm', STYLE, out)
-    titles = [f'{names[o]}\n$T = {t:g}$, {loss_text(p)}' for (o, t), p in zip(configurations, panels)]
-    grid(out / 'views-rocker-arm-objectives.pdf', panels, 2, 'coolwarm', titles=titles)
-
-
-def max_planck_hybrid(data, runs, out):
-    """Left: the input and the dynamic queue started from it. Right: two baseline cycles and the hybrid's queue after them."""
-    target = 0.75
-    panels = [Panel(data, runs, 'max-planck', target), Panel(data, runs, 'max-planck', target, 'baseline', cycles=2),
-              Panel(data, runs, 'max-planck', target, 'dynamic-queue', 'global-average'),
-              Panel(data, runs, 'max-planck', target, 'hybrid', 'global-average')]
-    capture(panels, 'max-planck', BRIGHT, out, crop=(0, .10, 1, .84))
-    names = ['Input', 'Baseline, 2 cycles', 'Dynamic / global avg.', 'Hybrid / global avg.']
-    grid(out / 'views-max-planck-hybrid.pdf', panels, 2, 'coolwarm',
-         titles=[f'{name}, {loss_text(p)}' for name, p in zip(names, panels)], target=target, last_titles_below=True,
-         arrows=['Queue', 'Queue'])
-
-
-def elk_antlers(data, runs, out):
-    target = 1.0
-    panels = [Panel(data, runs, 'elk', target), Panel(data, runs, 'elk', target, 'baseline'),
-              Panel(data, runs, 'elk', target, 'baseline', cycles=25)]
-    capture(panels, 'elk', STYLE, out, crop=(0, .21, 1, .67))
-    titles = ['Input', '\n'.join(['Baseline, $k=5$', deviation_text(panels[1])]),
-              '\n'.join(['Baseline, $k=25$', deviation_text(panels[2])])]
-    grid(out / 'views-elk-antlers-1x3.pdf', panels, 3, 'coolwarm', titles=titles, below=[loss_text(p) for p in panels],
-         target=target)
-
-
-def write_obj(path, vertices, faces):
-    keep = sorted({vertex for face in faces for vertex in face})
-    index = {vertex: position + 1 for position, vertex in enumerate(keep)}
-    lines = [f'v {vertices[v][0]!r} {vertices[v][1]!r} {vertices[v][2]!r}\n' for v in keep]
-    lines += [f'f {index[a]} {index[b]} {index[c]}\n' for a, b, c in faces]
-    path.write_text(''.join(lines))
-
-
-def horse_cap(data, runs, out):
-    """A long edge as the base of two caps: no single edit improves it, flipping it and collapsing the new diagonal does.
-    The last two panels apply these edits here by hand, no queue made them."""
-    numbers = data.horse_cap
-    corners = numbers['vertices']
-    a, b, c, d = corners['A'], corners['B'], corners['C'], corners['D']
-    target_length = numbers['target_length']
-    run = runs / 'core' / scan_meshes.HORSE_CAP_RUN
-    vertices, all_faces = scan_meshes.load_obj(run / 'remeshed.obj')
-    stored = scan_meshes.StoredMesh(run / 'remeshed.obj', dict(target_length=target_length, epsilon=0.0))
-    _, _, face_1, face_2, new_faces = stored.flip_quad(a, c)
-    faces = [[int(x) for x in face] for index, face in enumerate(all_faces) if index not in (face_1, face_2)]
-    moved = vertices.tolist()
-    moved[b] = ((vertices[b] + vertices[d]) / 2).tolist()
-
-    crop = (.30, .28, .57, .72)
-    panels = []
-    with tempfile.TemporaryDirectory() as temporary:
-        flip, collapse = Path(temporary) / 'flip.obj', Path(temporary) / 'collapse.obj'
-        write_obj(flip, vertices.tolist(), faces + new_faces)
-        write_obj(collapse, moved, [[b if x == d else x for x in face] for face in faces])
-        for index, source in enumerate([run / 'remeshed.obj', flip, collapse]):
-            path = Path(temporary) / f'{index}.png'
-            render.screenshot(source, path, ['--camera', CAMERAS['horse-cap'], *STYLE], target_length)
-            image = (plt.imread(path)[..., :3] * 255).round().astype(np.uint8)
-            height, width = image.shape[:2]
-            panels.append(SimpleNamespace(image=image[round(crop[1] * height):round(crop[3] * height),
-                                                      round(crop[0] * width):round(crop[2] * width)]))
-
-    view = np.array(json.loads(CAMERAS['horse-cap'])['viewMat']).reshape(4, 4)
-    size = np.tan(np.pi / 8)
-
-    def in_panel(point):
-        """The fraction of the cropped panel where a point of the mesh appears, with y upwards."""
-        camera_space = view[:3, :3] @ point + view[:3, 3]
-        x = camera_space[0] / -camera_space[2] / (size * render.WINDOW_WIDTH / render.WINDOW_HEIGHT) * .5 + .5
-        y = camera_space[1] / -camera_space[2] / size * -.5 + .5
-        return (x - crop[0]) / (crop[2] - crop[0]), 1 - (y - crop[1]) / (crop[3] - crop[1])
-
-    def overlay(ax, index):
-        edge = {0: (a, c, LONG_EDGE), 1: (b, d, SHORT_EDGE)}.get(index)
-        if edge:
-            ax.plot(*zip(in_panel(vertices[edge[0]]), in_panel(vertices[edge[1]])), color=edge[2], lw=1.1,
-                    solid_capstyle='round', transform=ax.transAxes, zorder=3)
-
-    def gain(operation, value):
-        return rf'$g_{{\mathrm{{sum}}}}({operation})={value:+.2f}$'
-
-    titles = [gain('s', numbers['split_gain_sum']), gain('f', numbers['flip_gain_sum']),
-              rf"$g_{{\mathrm{{sum}}}}(f)+g_{{\mathrm{{sum}}}}(c)={numbers['net_gain_sum']:+.2f}$"]
-    grid(out / 'views-horse-cap.pdf', panels, 3, 'coolwarm', titles=titles, target=1, overlay=overlay)
-
-
-FIGURES = {'views-bunny-iterations': bunny_iterations, 'views-bunny-queue-objectives-4x3': bunny_queue_objectives,
-           'views-rocker-arm-objectives': rocker_arm_objectives, 'views-horse-cap': horse_cap,
-           'views-max-planck-hybrid': max_planck_hybrid, 'views-elk-antlers-1x3': elk_antlers}

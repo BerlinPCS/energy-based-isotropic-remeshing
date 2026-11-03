@@ -9,9 +9,9 @@
 
 namespace remeshing {
 
-// Sec. 3.2: phase-based (baseline, convergent, ordered), queue-based (dynamic queue, batched), combined (hybrid,
+// Sec. 3.2: phase-based (baseline, repeated, ordered), queue-based (dynamic queue, batched), combined (hybrid,
 // alternating).
-enum class Approach { Baseline, Convergent, Ordered, DynamicQueue, Batched, Hybrid, Alternating };
+enum class Approach { Baseline, Repeated, Ordered, DynamicQueue, Batched, Hybrid, Alternating };
 
 // Sec. 3.2.2: the objectives of the queue-based and combined approaches.
 enum class Objective { Sum, Maximum, LocalAverage, GlobalAverage };
@@ -63,8 +63,8 @@ bool uses_objective(Approach approach);
 std::string to_string(Approach approach);
 std::string to_string(Objective objective);
 std::string to_string(StopReason reason);
-inline constexpr Approach APPROACHES[] = {Approach::Baseline,	  Approach::Convergent, Approach::Ordered,
-										  Approach::DynamicQueue, Approach::Batched,	Approach::Hybrid,
+inline constexpr Approach APPROACHES[] = {Approach::Baseline,	  Approach::Repeated, Approach::Ordered,
+										  Approach::DynamicQueue, Approach::Batched,  Approach::Hybrid,
 										  Approach::Alternating};
 inline constexpr Objective OBJECTIVES[] = {Objective::Sum, Objective::Maximum, Objective::LocalAverage,
 										   Objective::GlobalAverage};

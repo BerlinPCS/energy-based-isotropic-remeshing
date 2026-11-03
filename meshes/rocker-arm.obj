@@ -1,6 +1,5 @@
-# rocker-arm.obj: cleaned from rocker-arm.obj by scripts/clean_benchmark_meshes.py
-# removed 0 isolated vertices, 0 degenerate and 0 duplicate faces; collapsed 0 edges < 0 x mean edge length; flipped 0 cap edges (angle > 180 deg)
-# p_out = (p_in - (0, 0, 0)) * 2
+# rocker-arm.obj: rocker arm from Common 3D Test Models (see README),
+# centered and scaled so that the longest side of its bounding box is 2 (thesis App. A)
 v -0.248916 0.337752 0.99898
 v -0.250956 0.325006 0.99949
 v -0.236426 0.336222 1

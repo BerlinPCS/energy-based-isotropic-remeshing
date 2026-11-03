@@ -26,7 +26,7 @@ inline double average_edge_length(const Mesh& mesh) {
 	return sum / mesh.n_edges();
 }
 
-// A zero-length edge would have an infinite loss; this finite stand-in keeps the running sums usable.
+// A (numerically) zero-length edge would have an infinite loss; this finite stand-in keeps the running sums usable.
 inline constexpr double ZERO_LENGTH_EDGE_LOSS = 1e6;
 
 // lambda(e) = log2(length / ell_*)^2
@@ -37,7 +37,7 @@ inline double edge_loss(double length, double ell_star) {
 	return std::isfinite(loss) ? loss : ZERO_LENGTH_EDGE_LOSS;
 }
 
-// The loss of every edge and their sum, the energy E is cached to prevent repeated recomputation, 
+// The loss of every edge and their sum E are cached to prevent repeated recomputation, 
 // since computing the loss is one of the most essential and frequent operations.
 class EdgeLosses {
 public:
@@ -53,6 +53,11 @@ public:
 	void rebuild() {
 		energy_ = 0.0;
 		for (Edge e : mesh_.edges()) add(e);
+	}
+	// When copying a mesh.
+	void reattach() {
+		losses_ = mesh_.edge_property<double>("e:edge_loss", 0.0);
+		rebuild();
 	}
 	void remove(Edge e) { energy_ -= losses_[e]; }
 	void add(Edge e) {

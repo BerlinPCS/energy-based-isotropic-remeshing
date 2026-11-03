@@ -17,9 +17,9 @@ front), like Blender's default studio light.
 from math import cos, pi, sin, sqrt
 from pathlib import Path
 
-from common.edit_pairs import EditPair, read_obj, signature
-from common.style import define_color
-from common.tikz3d import Camera, angle, edges_of, normal
+from shared.edit_pairs import EditPair, read_obj, signature
+from shared.style import define_color
+from shared.tikz3d import Camera, angle, edges_of, normal
 
 MESHES = Path(__file__).resolve().parent / "validity_checks_meshes"
 # The columns of the figure: operation, camera azimuth and elevation in degrees.

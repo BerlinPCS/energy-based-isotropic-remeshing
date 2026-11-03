@@ -1,4 +1,4 @@
-// Sec. 3.2.1: the cycles of Botsch and Kobbelt, in index order (baseline, convergent) or with split and collapse
+// Sec. 3.2.1: the cycles of Botsch and Kobbelt, in index order (baseline, repeated) or with split and collapse
 // candidates sorted by length (ordered).
 
 #include "remeshing/schedules.h"
@@ -133,21 +133,26 @@ Result run_fixed_cycles(Run& run, CandidateOrder order, int cycles) {
 	return result;
 }
 
-Result run_convergent_cycles(Run& run, CandidateOrder order) {
+Result run_repeated_cycles(Run& run, CandidateOrder order) {
 	Result result;
 	result.stop = StopReason::CycleCap;
 	double previous = run.average_loss();
 	for (int cycle = 0; cycle < MAX_CYCLES; ++cycle) {
+		const Checkpoint before(run);
 		run_cycle(run, order);
 		result.cycles++;
 		const double current = run.average_loss();
 		const double relative_decrease =
 			(previous - current) / std::max(std::abs(previous), std::numeric_limits<double>::epsilon());
-		previous = current;
 		if (relative_decrease < DELTA_C) {
 			result.stop = StopReason::Stagnation;
+			if (current > previous) {
+				before.restore(run);
+				result.cycles--;
+			}
 			break;
 		}
+		previous = current;
 	}
 	return result;
 }

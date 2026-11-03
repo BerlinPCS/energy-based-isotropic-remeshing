@@ -29,7 +29,7 @@ int run(int argc, char** argv) {
 	args::Positional<std::string> input_arg(parser, "INPUT", "Closed triangle mesh (OBJ, OFF, STL or PMP)");
 	args::Positional<std::string> output_arg(parser, "OUTPUT_DIR", "Directory for the results");
 	args::ValueFlag<std::string> approach_arg(
-		parser, "NAME", "baseline, convergent, ordered, dynamic-queue, batched, hybrid or alternating", {"approach"});
+		parser, "NAME", "baseline, repeated, ordered, dynamic-queue, batched, hybrid or alternating", {"approach"});
 	args::ValueFlag<std::string> objective_arg(
 		parser, "NAME", "sum, maximum, local-average or global-average", {"objective"});
 	args::ValueFlag<double> target_arg(parser, "T", "Target edge length as a multiple of the input's average edge",

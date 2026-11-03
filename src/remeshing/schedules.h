@@ -10,11 +10,28 @@
 
 namespace remeshing {
 
+// Sec. 3.1.4: the state before a cycle or an alternating round, to undo one that raised the average loss.
+class Checkpoint {
+public:
+	explicit Checkpoint(const Run& run) : mesh_(run.mesh), edits_(run.edits) {}
+
+	void restore(Run& run) const {
+		run.mesh = mesh_;
+		run.losses.reattach();
+		run.edits = edits_;
+		trace_event(run, "rollback");
+	}
+
+private:
+	Mesh mesh_;
+	EditCounts edits_;
+};
+
 // cycles.cpp, Sec. 3.2.1
 enum class CandidateOrder { Index, Length };
 void run_cycle(Run& run, CandidateOrder order);
 Result run_fixed_cycles(Run& run, CandidateOrder order, int cycles);
-Result run_convergent_cycles(Run& run, CandidateOrder order);
+Result run_repeated_cycles(Run& run, CandidateOrder order);
 
 // dynamic_queue.cpp, Sec. 3.2.2, Algorithm 3.1. A stage runs until it stops, or also ends at the knee.
 enum class StageEnd { UntilStopped, AtKnee };

@@ -1,6 +1,5 @@
-# horse.obj: cleaned from horse.obj by scripts/clean_benchmark_meshes.py
-# removed 0 isolated vertices, 0 degenerate and 0 duplicate faces; collapsed 0 edges < 0 x mean edge length; flipped 0 cap edges (angle > 180 deg)
-# p_out = (p_in - (0, 3.7252903e-09, 3.72529031e-09)) * 10.9086345
+# horse.obj: horse from Common 3D Test Models (see README),
+# centered and scaled so that the longest side of its bounding box is 2 (thesis App. A)
 v -0.0220572593 -0.438292613 -0.00941419531
 v 0.00439618016 -0.676537216 -0.0599757177
 v -0.0312314222 -0.655123559 -0.104362957

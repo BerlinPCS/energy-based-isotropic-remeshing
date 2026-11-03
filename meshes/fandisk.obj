@@ -1,6 +1,5 @@
-# fandisk.obj: cleaned from fandisk.off by scripts/clean_benchmark_meshes.py
-# removed 0 isolated vertices, 0 degenerate and 0 duplicate faces; collapsed 0 edges < 0 x mean edge length; flipped 0 cap edges (angle > 180 deg)
-# p_out = (p_in - (0, 0, -2.98e-08)) * 1
+# fandisk.obj: fandisk from the PMP 3.0.0 sample data (see README),
+# centered and scaled so that the longest side of its bounding box is 2 (thesis App. A)
 v 0.920571029 0.0521006994 0.0513024479
 v 0.920571029 0.055571001 0.01392355
 v 0.884634972 0.0545908995 0.0321466513

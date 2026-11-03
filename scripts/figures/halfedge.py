@@ -10,7 +10,7 @@ and dashed.
 
 from math import atan2, degrees, hypot
 
-from common.style import define_color
+from shared.style import define_color
 
 P = {"a": (0.0, 0.0), "b": (0.0, 3.0), "l": (-2.75, 1.5), "r": (2.75, 1.5)}
 FACES = {"f": ("a", "b", "l"), "g": ("b", "a", "r")}

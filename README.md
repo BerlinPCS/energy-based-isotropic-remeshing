@@ -34,7 +34,7 @@ The following settings are changeable:
 
 | Option | Values | Applies to |
 |---|---|---|
-| `--approach` | `baseline`, `convergent`, `ordered`, `dynamic-queue`, `batched`, `hybrid`, `alternating` | all |
+| `--approach` | `baseline`, `repeated`, `ordered`, `dynamic-queue`, `batched`, `hybrid`, `alternating` | all |
 | `--objective` | `sum`, `maximum`, `local-average`, `global-average` | queue-based approaches |
 | `--target` | T, with ℓ\* = T · ℓ_avg | all |
 | `--cycles` | k (default 5) | `baseline`, `ordered` |
@@ -48,23 +48,41 @@ meshes of the thesis and `cube.obj`, a small test mesh.
 
 ## Reproducing the thesis
 
-prepare meshes --> runner script --> one dataset --> generate results, figures and appendixes from dataset
+runner script --> single full dataset --> generate results, figures and appendixes from dataset
 
 ```sh
 python3 -m pip install -r scripts/requirements.txt          
 python3 scripts/run_experiments.py meshes FOLDER                # about 75 minutes and 11 GB. Into data/
-python3 scripts/generate_results.py --data FOLDER --runs FOLDER # into results/
-python3 scripts/generate_figures.py                             # into results/
-python3 scripts/generate_appendix_a.py --data FOLDER            # into results/
+python3 scripts/generate_figures.py --data FOLDER --runs FOLDER # into results/
 ```
 
 | Script | Writes |
 |---|---|
-| `run_experiments.py` |`results.csv`, `traces.csv`, `scans.csv`, `inputs.csv`, `horse-cap.json`, `failures.csv`, `BUILD_INFO`, and the output meshes.  |
-| `generate_results.py [--only NAME ...]` | `claims.csv`, the tables, the plots and the mesh images of Ch. 1, 3, 4 and App. B. |
-| `generate_figures.py [NAME ...]` | The schematic figures of Ch. 2 and 3 as TikZ files. |
-| `generate_appendix_a.py` | The mesh table and gallery of App. A. |
+| `run_experiments.py` |`results.csv`, `traces.csv`, `scans.csv`, `inputs.csv`, `failures.csv`, `BUILD_INFO`, and the output meshes.  |
+| `generate_figures.py [NAME ...]` | Every figure and table of the thesis, from one module per figure or table in [`scripts/figures/`](scripts/figures): the schematic figures of Ch. 2 and 3, the plots and tables of Ch. 3, 4 and App. A and B, and with `--runs` the mesh images of Ch. 1 and 4. Helpers they share are in [`scripts/shared/`](scripts/shared). |
 
-[`data/`](data) holds the CSV files of the run behind the thesis, without its output meshes, so that all numbers, tables
-and plots rebuild without running anything (`python3 scripts/generate_results.py`). Only the mesh images need the output
-meshes (`--runs`) and a display.
+[`data/`](data) holds the CSV files of the run behind the thesis, without its output meshes, so that all tables and plots
+rebuild without running anything (`python3 scripts/generate_figures.py`). The mesh images and the gallery of App. A are
+rendered with `mesh-screenshot` and need a display; they are only made with `--runs`, which also gives the mesh images
+their output meshes, or when named (`generate_figures.py mesh_gallery`).
+
+[`scripts/claims.py`](scripts/claims.py) is not part of the pipeline. It shows how each number in the text follows from
+`data/`, going through the thesis section by section, and prints the numbers when run (`python3 scripts/claims.py`).
+
+## Licence and mesh credits
+
+The code and scripts are under the MIT licence ([`LICENSE`](LICENSE)). The benchmark meshes in `meshes/` are not. They
+come from the sources below and were prepared as described in App. A of the thesis; the header of each file names its
+preparation.
+
+| Mesh | Source |
+|---|---|
+| `stanford-bunny`, `stanford-bunny-low` (decimated) | [Stanford 3D Scanning Repository](https://graphics.stanford.edu/data/3Dscanrep/) |
+| `armadillo-r128` | [Stanford 3D Scanning Repository](https://graphics.stanford.edu/data/3Dscanrep/) |
+| `stanford-dragon-r128` | [Stanford 3D Scanning Repository](https://graphics.stanford.edu/data/3Dscanrep/) |
+| `fandisk` | Hoppe et al. 1994, from the sample data of [PMP](https://github.com/pmp-library/pmp-library) 3.0.0 |
+| `max-planck` (MPI), `horse` (Cyberware), `rocker-arm` (INRIA), `homer` (origin unknown) | [Common 3D Test Models](https://github.com/alecjacobson/common-3d-test-models), Alec Jacobson |
+| `elk` | [CGAL sample meshes](https://github.com/CGAL/cgal/tree/master/Data/data/meshes) |
+
+The Stanford models may be used and redistributed for research with credit to the Stanford Computer Graphics
+Laboratory, but not for commercial purposes without its permission. The other sources state no licence for these models.

@@ -36,12 +36,12 @@ Result remesh(Mesh& mesh, const Settings& settings, std::atomic<uint64_t>* edits
 	case Approach::Baseline:
 		result = run_fixed_cycles(run, CandidateOrder::Index, settings.cycles.value_or(DEFAULT_CYCLES));
 		break;
-	case Approach::Convergent:
-		result = run_convergent_cycles(run, CandidateOrder::Index);
+	case Approach::Repeated:
+		result = run_repeated_cycles(run, CandidateOrder::Index);
 		break;
 	case Approach::Ordered:
 		result = settings.cycles ? run_fixed_cycles(run, CandidateOrder::Length, *settings.cycles)
-								 : run_convergent_cycles(run, CandidateOrder::Length);
+								 : run_repeated_cycles(run, CandidateOrder::Length);
 		break;
 	case Approach::DynamicQueue:
 		result.stop = run_queue_stage(run, StageEnd::UntilStopped);
@@ -67,15 +67,15 @@ Result remesh(Mesh& mesh, const Settings& settings, std::atomic<uint64_t>* edits
 }
 
 bool uses_objective(Approach approach) {
-	return approach != Approach::Baseline && approach != Approach::Convergent && approach != Approach::Ordered;
+	return approach != Approach::Baseline && approach != Approach::Repeated && approach != Approach::Ordered;
 }
 
 std::string to_string(Approach approach) {
 	switch (approach) {
 	case Approach::Baseline:
 		return "baseline";
-	case Approach::Convergent:
-		return "convergent";
+	case Approach::Repeated:
+		return "repeated";
 	case Approach::Ordered:
 		return "ordered";
 	case Approach::DynamicQueue:

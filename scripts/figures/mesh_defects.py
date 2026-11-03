@@ -22,7 +22,7 @@ import random
 from collections import Counter, defaultdict
 from math import cos, pi, radians, sin, sqrt
 
-from common.style import define_color
+from shared.style import define_color
 
 AMBIENT = 0.66
 PITCH = 2.42  # cm between panel centres

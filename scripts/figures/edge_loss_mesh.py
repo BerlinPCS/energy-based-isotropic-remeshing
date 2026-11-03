@@ -26,7 +26,7 @@ All numbers in the figures are computed here and asserted.
 import math
 import random
 
-from common.style import define_color
+from shared.style import define_color
 
 L = 1.0
 S3 = math.sqrt(3) / 2

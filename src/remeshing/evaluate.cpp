@@ -45,9 +45,7 @@ bool apply_objective(const Run& run, const AffectedLosses& affected, Evaluation&
 	return false;
 }
 
-// Every edit lowers the average loss, and the gain is (g_sum + d_o * average) / |A|. A split that fails at the current
-// average therefore passes later only if it improves the average now; a collapse passes once the average has dropped
-// enough, which needs g_sum > 0.
+// Some operations may pass later under global average
 bool may_pass_later(const Run& run, const Evaluation& evaluation) {
 	if (evaluation.d_o > 0)
 		return global_average_gain(run.losses.energy(), static_cast<int>(run.mesh.n_edges()), evaluation.g_sum,
@@ -108,7 +106,7 @@ Evaluation evaluate_collapse(const Run& run, Edge e, bool retain) {
 	AffectedLosses affected;
 	affected.sum_before = affected.max_before = run.losses[e];
 	affected.count_before = 1;
-	static thread_local std::vector<Vertex> neighbors; // reused, as this runs for every candidate
+	static thread_local std::vector<Vertex> neighbors;
 	neighbors.clear();
 	for (Halfedge h : mesh.halfedges(from)) {
 		const Vertex v = mesh.to_vertex(h);
@@ -168,7 +166,6 @@ Evaluation evaluate_relocation(const Run& run, Vertex v) {
 	if (pmp::norm(step) == 0.0) return {};
 
 	AffectedLosses affected;
-	// The step sizes below re-score the same ring, so its positions are gathered once.
 	static thread_local std::vector<Point> neighbor_positions;
 	neighbor_positions.clear();
 	for (Halfedge h : mesh.halfedges(v)) {
