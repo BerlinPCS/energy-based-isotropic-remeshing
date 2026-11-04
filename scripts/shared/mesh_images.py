@@ -3,11 +3,13 @@
 All panels of a figure share the camera and the image-space crop, the union of their non-background pixels, so that they
 stay aligned and little white background is left.
 """
+import io
 import tempfile
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pikepdf
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Normalize
 from matplotlib.lines import Line2D
@@ -105,6 +107,24 @@ def deviation_text(panel):
     return rf'$d_{{\mathrm{{RMS}}}}={1e3 * panel.deviation:.3g}\cdot 10^{{-3}}$'
 
 
+def jpeg_panels(path, quality=95):
+    """Re-encode the panels of a composed PDF as JPEG; matplotlib embeds images only losslessly, which makes the 600 ppi
+    panels two to two and a half times larger. Full chroma resolution (4:4:4) keeps the colour of the thin out-of-band
+    edges. Images under 200 px on a side, such as the colour bar's gradient, stay lossless, and so does a panel whose
+    lossless stream is already smaller."""
+    with pikepdf.open(path, allow_overwriting_input=True) as pdf:
+        for page in pdf.pages:
+            for stream in page.get_images().values():
+                image = pikepdf.PdfImage(stream)
+                if min(image.width, image.height) < 200:
+                    continue
+                data = io.BytesIO()
+                image.as_pil_image().convert('RGB').save(data, 'JPEG', quality=quality, subsampling=0)
+                if len(data.getvalue()) < len(stream.read_raw_bytes()):
+                    stream.write(data.getvalue(), filter=pikepdf.Name.DCTDecode)
+        pdf.save(path)
+
+
 def grid(path, cells, columns, colormap, titles=None, below=None, column_titles=None, row_titles=None, band=False,
          target=None, last_titles_below=False, arrows=None, overlay=None, max_height=None, row_title_width=45 * POINT):
     """cells: panels in row-major order. titles: one per cell, above the panel. below: one text per cell, under it.
@@ -186,3 +206,4 @@ def grid(path, cells, columns, colormap, titles=None, below=None, column_titles=
                        ncol=2, columnspacing=1, borderaxespad=0)
         fig.savefig(path, dpi=DPI)
         plt.close(fig)
+    jpeg_panels(path)
