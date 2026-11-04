@@ -1,8 +1,7 @@
 # Energy-Based Isotropic Remeshing
 
 Code of the bachelor's thesis *Energy-Based Isotropic Remeshing* (TU Berlin, Computer Graphics). It implements the
-approaches of Ch. 3 and some of the metrics of Sec. 4.1, and nothing else. Code was adapted after finishing the thesis
-to reflect the names and definitions of the thesis.
+approaches of Ch. 3 and some of the metrics of Sec. 4.1, and nothing else.
 
 ## Build
 
@@ -25,8 +24,8 @@ The programs end up in `build/bin/`.
 | `mesh-screenshot` | Renders a mesh or a result folder with the edge-loss colouring to a PNG. |
 
 ```sh
-build/bin/remesher-cli meshes/cube.obj results/baseline --approach baseline --target 0.3
-build/bin/remesher-cli meshes/cube.obj results/hybrid --approach hybrid --objective sum --target 0.3
+build/bin/remesher-cli meshes/stanford-bunny-low.obj results/baseline --approach baseline --target 0.3
+build/bin/remesher-cli meshes/stanford-bunny-low.obj results/hybrid --approach hybrid --objective sum --target 0.3
 build/bin/viewer results
 ```
 
@@ -44,15 +43,13 @@ The following settings are changeable:
 Every other constant is in [`src/remeshing/parameters.h`](src/remeshing/parameters.h).
 
 Input meshes must be closed triangle meshes without isolated vertices (Sec. 3.1.1). `meshes/` holds the ten benchmark
-meshes of the thesis and `cube.obj`, a small test mesh.
+meshes of the thesis.
 
 ## Reproducing the thesis
 
-runner script --> single full dataset --> generate results, figures and appendixes from dataset
-
 ```sh
-python3 -m pip install -r scripts/requirements.txt          
-python3 scripts/run_experiments.py meshes FOLDER                # about 75 minutes and 11 GB. Into data/
+python3 -m pip install -r scripts/requirements.txt
+python3 scripts/run_experiments.py meshes FOLDER                # about 70 minutes and 10 GB.
 python3 scripts/generate_figures.py --data FOLDER --runs FOLDER # into results/
 ```
 
