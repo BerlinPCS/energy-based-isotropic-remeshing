@@ -54,7 +54,7 @@ def generate(data, out):
                      label=rf'${KNEE_RATE_FRACTION:g}\times$ best window so far')
         ax_gain.set_xlim(0, knee.end / 1000 * 2.2)
         ax_gain.set_xlabel('executed operations (thousands)')
-        ax_gain.set_ylabel(r'relative decrease of $\bar\lambda$ (\%)')
+        ax_gain.set_ylabel(r'relative decrease of $\bar\lambda$ (%)')
         ax_gain.set_title(rf'(b) windows of $K={window}$ operations', loc='left')
         ax_gain.legend(loc='upper right')
         fig.tight_layout(w_pad=1.2)

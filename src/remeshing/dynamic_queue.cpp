@@ -66,8 +66,7 @@ public:
 	}
 
 	// The next entry to remove: the head of the only queue, or for the global average, of the three heads, the one
-	// with the largest current gain among those that pass their acceptance test. A head that fails ranks last, and
-	// passing is monotone in g_sum within a queue, so if a current head comes out first and fails, so does every entry.
+	// with the largest current gain among those that pass their acceptance test. 
 	Heap& next_heap() {
 		if (!global_average_) return heaps_[0];
 		size_t best = heaps_.size();

@@ -230,8 +230,14 @@ def record_build(cli, out_dir):
         if cache.exists() else []
     processor = subprocess.run(['sysctl', '-n', 'machdep.cpu.brand_string'], capture_output=True, text=True).stdout
     compiler = subprocess.run(['c++', '--version'], capture_output=True, text=True).stdout.splitlines()[:1]
+    # The commit of the source, marked as modified if the files that build the binary differ from it.
+    root = Path(__file__).resolve().parents[1]
+    commit = subprocess.run(['git', '-C', root, 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()
+    modified = subprocess.run(['git', '-C', root, 'status', '--porcelain', '--', 'src', 'apps', 'cmake',
+                               'CMakeLists.txt'], capture_output=True, text=True).stdout.strip()
+    source = [f'source commit {commit}' + (' (modified)' if modified else '')] if commit else []
     (out_dir / 'BUILD_INFO').write_text('\n'.join([
-        datetime.datetime.now().isoformat(timespec='seconds'), processor.strip(), *compiler, *flags,
+        datetime.datetime.now().isoformat(timespec='seconds'), processor.strip(), *compiler, *flags, *source,
         'remesher-cli sha256 ' + hashlib.sha256(cli.read_bytes()).hexdigest()]) + '\n')
 
 

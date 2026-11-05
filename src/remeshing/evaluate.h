@@ -27,7 +27,7 @@ double global_average_gain(double energy, int edge_count, double g_sum, int d_o)
 bool global_average_accepts(double gain, double epsilon, int edge_count_after);
 
 // `retain` is set only by the dynamic queue under the global average (see dynamic_queue.cpp): `passes` then also holds
-// for valid splits and collapses that do not pass yet, but may once the average loss has dropped.
+// for valid collapses that do not pass yet, but may once the average loss has dropped.
 Evaluation evaluate_split(const Run& run, Edge e, bool retain = false);
 Evaluation evaluate_collapse(const Run& run, Edge e, bool retain = false);
 Evaluation evaluate_flip(const Run& run, Edge e);

@@ -45,13 +45,7 @@ bool apply_objective(const Run& run, const AffectedLosses& affected, Evaluation&
 	return false;
 }
 
-// Some operations may pass later under global average
-bool may_pass_later(const Run& run, const Evaluation& evaluation) {
-	if (evaluation.d_o > 0)
-		return global_average_gain(run.losses.energy(), static_cast<int>(run.mesh.n_edges()), evaluation.g_sum,
-								   evaluation.d_o) > 0.0;
-	return evaluation.g_sum > 0.0;
-}
+bool may_pass_later(const Evaluation& evaluation) { return evaluation.d_o < 0 && evaluation.g_sum > 0.0; }
 
 } // namespace
 
@@ -90,7 +84,7 @@ Evaluation evaluate_split(const Run& run, Edge e, bool retain) {
 	affected.count_before = 1;
 	affected.count_after = 4;
 	const bool accepted = apply_objective(run, affected, result);
-	result.passes = accepted || (retain && may_pass_later(run, result));
+	result.passes = accepted;
 	return result;
 }
 
@@ -135,9 +129,8 @@ Evaluation evaluate_collapse(const Run& run, Edge e, bool retain) {
 	result.position = collapse.position;
 	result.collapse = collapse.halfedge;
 	const bool accepted = apply_objective(run, affected, result);
-	// The normal test is the expensive part of the check, so it comes last.
-	result.passes =
-		(accepted || (retain && may_pass_later(run, result))) && collapse_passes_normal_test(mesh, collapse);
+]	result.passes =
+		(accepted || (retain && may_pass_later(result))) && collapse_passes_normal_test(mesh, collapse);
 	return result;
 }
 

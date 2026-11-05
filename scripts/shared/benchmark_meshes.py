@@ -6,6 +6,7 @@ from shared import render
 
 STANFORD = "Stanford~\\cite{stanford3dscanrep}"
 COMMON_3D = "\\cite{jacobson2020common3d}"
+CGAL = "CGAL~\\cite{cgaldata}"
 
 
 @dataclass(frozen=True)
@@ -49,5 +50,5 @@ MESHES = [
          detail_side=0.273),
     Mesh("homer", "Homer", "unknown~" + COMMON_3D, camera=HOMER_CAMERA, detail=(0.079, 0.499), detail_side=0.165),
     # The zoom sits on the toothed rim of the antler plate, where both sides of the thin sheet are visible.
-    Mesh("elk", "Elk", "CGAL~\\cite{cgaldata}", camera=ELK_CAMERA, detail=(0.737, 0.157), detail_side=0.175),
+    Mesh("elk", "Elk", CGAL, camera=ELK_CAMERA, detail=(0.737, 0.157), detail_side=0.175),
 ]
