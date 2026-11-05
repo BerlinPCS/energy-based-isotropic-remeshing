@@ -129,7 +129,7 @@ Evaluation evaluate_collapse(const Run& run, Edge e, bool retain) {
 	result.position = collapse.position;
 	result.collapse = collapse.halfedge;
 	const bool accepted = apply_objective(run, affected, result);
-]	result.passes =
+	result.passes =
 		(accepted || (retain && may_pass_later(result))) && collapse_passes_normal_test(mesh, collapse);
 	return result;
 }
