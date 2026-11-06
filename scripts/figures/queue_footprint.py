@@ -24,10 +24,6 @@ GAP = 4.05  # cm between panel centres
 CENTRE_FLIPS = ((0, 1), (0, -1))  # spokes of v that are flipped away, so that v has valence 4
 SPLIT_ENDS = ((1, 0), (-1, 0))  # opposite neighbours of v; v is placed at their midpoint
 RELAX_ITERATIONS = 200
-FLIP = ((0, 0), (0, 1))  # flipped edge (lattice indices); its new diagonal runs at 150 degrees
-FLIP_STRETCH = 0.1  # moves the old edge's endpoints apart, lattice units
-FLIP_SQUEEZE = 0.15  # moves the opposite vertices together, so the new diagonal is not much longer than the old edge
-ROW_SPACE = 0.55  # cm between the lowest vertex of the top row and the titles of the flip row
 
 
 def lattice(rings=RINGS):
@@ -78,13 +74,6 @@ def relax(pos, faces, movable):
                    sum(pos[u][1] for u in neighbours[v]) / len(neighbours[v])) if v in movable else xy
                for v, xy in pos.items()}
     return pos
-
-
-def connecting(faces, a, b):
-    """The edges whose flip would connect a and b: shared by a face with a and a face with b."""
-    with_a = edges_of([f for f in faces if a in f])
-    with_b = edges_of([f for f in faces if b in f])
-    return {e for e in with_a & with_b if a not in e and b not in e}
 
 
 def edges_of(faces):
@@ -144,7 +133,7 @@ def relocation_row():
 
     return {
         "pos": pos, "faces": faces, "edges": edges, "shaded": set(incident_faces), "dark_vertices": {centre},
-        "dark_edges": set(), "offset": (0.0, 0.0), "under_vertices": lambda dx, dy: [], "over_vertices": over_vertices,
+        "over_vertices": over_vertices,
         "panels": (
             ("(a) split and flip", split_flip, set()),
             ("(b) collapse", collapse, set()),
@@ -153,34 +142,24 @@ def relocation_row():
     }
 
 
-
-def dist(pos, a, b):
-    return sqrt((pos[a][0] - pos[b][0]) ** 2 + (pos[a][1] - pos[b][1]) ** 2)
-
-
 def point(pos, v, dx, dy=0.0):
     x, y = pos[v]
     return f"({x * SCALE + dx:.4f},{y * SCALE + dy:.4f})"
 
 
-def draw_row(lines, row, title_y, dy, first_panel):
-    ox, oy = row["offset"]
+def draw_row(lines, row, title_y):
     pos = row["pos"]
     for k, (title, hit_edges, hit_vertices) in enumerate(row["panels"]):
         dx = k * GAP
-        px, py = dx + ox, dy + oy
-        lines.append(f"% panel {first_panel + k}")
+        px, py = dx, 0.0
+        lines.append(f"% panel {k}")
         lines.append(rf"\node[fp label] at ({dx:.3f},{title_y:.3f}) {{{title}}};")
         for f in row["faces"]:
             fill = "opAfterFill" if f in row["shaded"] else "opNeutral"
             lines.append(rf"\fill[{fill}] " + " -- ".join(point(pos, v, px, py) for v in f) + " -- cycle;")
         for e in sorted(row["edges"]):
-            if e in row["dark_edges"]:
-                style = "fp dark"
-            else:
-                style = "fp hit" if e in hit_edges else "fp edge"
+            style = "fp hit" if e in hit_edges else "fp edge"
             lines.append(rf"\draw[{style}] {point(pos, e[0], px, py)} -- {point(pos, e[1], px, py)};")
-        lines += row["under_vertices"](px, py)
         for v in sorted(pos):
             if v in row["dark_vertices"]:
                 style = "fp vertex,fill=opInk"
@@ -211,7 +190,7 @@ def generate(out):
     ]
     top = relocation_row()
     radius = (RINGS + 0.25) * SCALE
-    draw_row(lines, top, radius + 0.25, 0.0, 0)
+    draw_row(lines, top, radius + 0.25)
 
     lines += [r"\end{tikzpicture}", r"\endgroup"]
     (out / "queue-footprint.tikz").write_text("\n".join(line + "%" for line in lines) + "\n")

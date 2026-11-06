@@ -83,4 +83,5 @@ def generate(data, runs, out):
 
     titles = [gain('s', SPLIT_GAIN), gain('f', FLIP_GAIN),
               rf'$g_{{\mathrm{{sum}}}}(f)+g_{{\mathrm{{sum}}}}(c)={FLIP_AND_COLLAPSE_GAIN:+.2f}$']
+    titles = [f'({label}) {subtitle}\n{title}' for label, subtitle, title in zip('abc', ['original configuration', 'after flip', 'after flip and collapse'], titles)]
     grid(out / 'views-horse-cap.pdf', panels, 3, 'coolwarm', titles=titles, target=1, overlay=overlay)

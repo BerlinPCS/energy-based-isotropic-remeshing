@@ -13,7 +13,7 @@ from shared.style import BLUE, ORANGE, PLOT_STYLE, TEXT_WIDTH_INCHES
 
 
 def cycle_panel(ax, data, tier, stops, target, reference_tier=None):
-    """The loss over k >= 4, the fewest cycles a run keeps, for every mesh and its median, relative to five cycles."""
+    """The loss over k >= 4 for every mesh and its median, relative to five baseline cycles."""
     counts = list(range(4, 51))
     meshes = sorted(data.core.input.unique())
     reference = data.reference[LOSS].xs(target, level='target')

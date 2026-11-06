@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Generation of the numbers in the thesis based on the dataset.
+"""Numbers and quantitative comparisons in the thesis prose, in order of appearance.
+
+Uses the dataset, apart from the equilateral-patch calculation in Ch. 4. Values printed only in figures and tables
+are computed by their generators; repeated prose summaries reuse the calculations below.
 
 usage: claims.py [--data DATA]
 """
@@ -18,19 +21,14 @@ DELTA_C_TESTS = [0, 1e-3, 3e-3, 1e-2]
 QUEUE_APPROACHES = ['dynamic-queue', 'batched', 'hybrid', 'alternating']
 
 
-def print_indent(message, spaces=2):
-    """Print a message with an indent, e.g. for the thesis."""
-    print(f'{" " * spaces}{message}')
-
-
 def claim(name, value, level=1):
     """Print a claim and its value. A dict prints as a group: the name, then one indented line per key."""
     if isinstance(value, dict):
-        print_indent(f'{name}:', 2 * level)
+        print(f'{"  " * level}{name}:')
         for key, item in value.items():
             claim(key, item, level + 1)
     else:
-        print_indent(f'{name}: {value}', 2 * level)
+        print(f'{"  " * level}{name}: {value}')
 
 
 def count(condition):
@@ -72,11 +70,10 @@ def introduction(data):
 def knee_figure(data):
     """The caption of the knee figure, replayed on the traced run (shared/knee.py)."""
     trace = knee_figure_trace(data)
-    window, _, knee = knee_windows(trace)
+    _, _, knee = knee_windows(trace)
     loss = trace.drop_duplicates('edits').set_index('edits').average_edge_loss  # the average loss after n edits
     claim('Edits without knee', int(loss.index.max()))
     claim('Edits with knee', int(knee.end))
-    claim('Window size', window)
     claim('Further decrease of the average loss after the knee', percent(1 - loss.iloc[-1] / loss[int(knee.end)], 0))
 
 
@@ -89,37 +86,36 @@ def setup(data):
             '# of failed runs': len(data.failures),
             'longest run (cap 900s)': f'{core.algorithm_time_ms_max.max() / 1000:.1f}s',
             'most cycles / rounds': int(core.cycles.max()),
-            'stop reasons': {reason: int(n) for reason, n in core.stop_reason.value_counts().items()}})          
+            'runs ending at an edit or cycle cap': count(core.stop_reason.isin(['edit-cap', 'cycle-cap']))})
     print()
 
     smallest = inputs.loc[['elk', 'stanford-bunny-low']]
     others = inputs.drop(smallest.index)
     ratios = [a / b for a in smallest.average_edge_length for b in others.average_edge_length]
     claim('Smallest inputs', {
-        'Elk edges': int(smallest.loc['elk'].edges),
-        'Bunny (low) edges': int(smallest.loc['stanford-bunny-low'].edges),
-        'Lowest edges of any other input': int(others.edges.min()),
+        'Elk vertices': int(smallest.loc['elk'].vertices),
+        'Bunny (low) vertices': int(smallest.loc['stanford-bunny-low'].vertices),
         'Elk / Bunny (low) avg. edge length vs other inputs': f'{value_range(ratios, 0)} x'})
     print()
 
     # The baseline on seven reorderings of each input, against the original order: the largest change per case.
     orders = data.tiers['input-order'].set_index(['input', 'target'])
-    change = (orders[LOSS] / data.reference[LOSS] - 1).abs()
-    largest = change.groupby(level=['input', 'target']).max()
+    change = orders[LOSS] / data.reference[LOSS] - 1
+    largest = change.abs().groupby(level=['input', 'target']).max()
     mesh, target = largest.idxmax()
+    worst_case = change.loc[(mesh, target)]
+    worst_change = worst_case.iloc[worst_case.abs().to_numpy().argmax()]
     claim('Baseline on reordered inputs', {
         '# of further orders': orders.order.nunique(),
         'largest loss change per case, median': percent(largest.median()),
-        'largest loss change per case, worst': f'{percent(largest.max())} ({MESH_NAMES[mesh]}, T = {target:g})'})
+        'largest loss change per case, worst': f'{signed_percent(worst_change)} ({MESH_NAMES[mesh]}, T = {target:g})'})
 
 
 def queues(data):
-    def heatmap_cell(approach, objective, target):
-        return f'{at_target(data.ratio(data.runs(approach, objective), LOSS), target).median():.2f}'
-
-    claim('Median loss ratio (Fig. queue-heatmap)', {
-        approach: {o: {f'T = {t:g}': heatmap_cell(approach, o, t) for t in TARGETS} for o in OBJECTIVES}
-        for approach in ['dynamic-queue', 'batched']})
+    # The smallest of the twelve medians must be >= 1 for the opening sentence of Results: Queues.
+    medians = [at_target(data.ratio(data.runs('dynamic-queue', o), LOSS), t).median()
+               for o in OBJECTIVES for t in TARGETS]
+    claim('Dynamic queue: smallest median loss ratio across objectives and targets', f'{min(medians):.3f}')
     print()
 
     claim('Runs ended by the safeguard', {
@@ -140,6 +136,15 @@ def queues(data):
     claim('Bunny, T = 0.75: edges too long', {
         'dynamic queue, sum': percent(data.scan('dynamic-queue', 'sum').long_fraction.loc[bunny]),
         'baseline': percent(data.scan('baseline').long_fraction.loc[bunny])})
+
+    # g_sum = b^2 - 2(b-1)^2 - 2(b-1+log2(sqrt(3)))^2 = -3b^2 + linear*b + constant.
+    offset = 1 - np.log2(np.sqrt(3))
+    linear, constant = 4 * (1 + offset), -2 * (1 + offset ** 2)
+    peak = linear / 6
+    claim('Split in an equilateral patch', {
+        'sum gain': f'-3 b^2 + {linear:.2f} b {constant:+.2f}',
+        'maximizing b': f'{peak:.2f}',
+        'maximum sum gain': f'{-3 * peak ** 2 + linear * peak + constant:.2f}'})
     failing = ['local-average', 'maximum']
 
     def blocked(objective):
@@ -158,15 +163,6 @@ def queues(data):
     claim('Dynamic queue, local average: outputs with an angle below 0.001 degrees (of 30)',
           count(data.runs('dynamic-queue', 'local-average').minimum_angle < 0.001))
     print()
-
-    def edit_ratio(approach, objective, operation):
-        """The median over meshes at T = 1.5 of an operation count relative to the baseline's."""
-        return f'{at_target(data.ratio(data.runs(approach, objective), operation), 1.5).median():.2f}'
-
-    pure_queues = ['dynamic-queue', 'batched']
-    claim('T = 1.5: operations vs baseline (median over meshes)', {
-        'collapses, local average': {a: edit_ratio(a, 'local-average', 'collapses') for a in pure_queues},
-        'flips, sum': {a: edit_ratio(a, 'sum', 'flips') for a in pure_queues}})
 
 
 def alternating_stages(data):
@@ -248,6 +244,7 @@ def repeated_cycles(data):
     repeated, ordered = data.runs('repeated'), data.runs('ordered')
     rule = stagnation_rule(data, DELTA_C)
     assert (rule.kept == repeated.cycles.loc[rule.index]).all(), 'the replay disagrees with the repeated runs'
+    np.testing.assert_allclose(rule.kept_loss, repeated.loc[rule.index, LOSS], rtol=1e-12, atol=0)
     claim('Repeated', {
         'kept cycles': {'median': f'{repeated.cycles.median():g}', 'fewest': int(repeated.cycles.min()),
                         'most': int(repeated.cycles.max())},
@@ -258,7 +255,7 @@ def repeated_cycles(data):
         'median loss rise undone': percent(rule[rule.undone].undone_rise.median())})
     print()
 
-    # Each rule against a fixed count at its median cycle count, in loss, time and case by case.
+    # Compare with the integer part of the median kept count: 14 for repeated, 12 for ordered (median 12.5).
     stop, ordered_stop = int(repeated.cycles.median()), int(ordered.cycles.median())
     same_count = {f'Repeated vs {stop} fixed cycles': (repeated, data.fixed(stop)),
                   f'Ordered vs {ordered_stop} fixed ordered cycles': (ordered, data.fixed(ordered_stop, ordered=True))}
@@ -271,7 +268,6 @@ def repeated_cycles(data):
             'median time ratio, fixed': f'{data.median_ratio(fixed, TIME):.2f}',
             'cases lower': count(ratios < 1),
             'cases higher': count(ratios > 1),
-            'cases equal': count(ratios == 1),
             'median absolute loss difference': percent((ratios - 1).abs().median(), 2)})
     print()
 
@@ -330,14 +326,11 @@ def runtime(data):
 
 
 def discussion(data):
-    claim('Median time ratio', {
-        'alternating (over objectives)':
-            value_range([data.median_ratio(data.runs('alternating', o), TIME) for o in OBJECTIVES], 1),
-        'repeated': f"{data.median_ratio(data.runs('repeated'), TIME):.2f}",
-        'ordered': f"{data.median_ratio(data.runs('ordered'), TIME):.2f}"})
-    claim('Cases below five cycles (of 30)', {
+    # Alternating's 30/30 is already printed under Combined Schedules. These counts establish that it is the only
+    # queue-based schedule to beat five cycles in every case.
+    claim('Other queue schedules: cases below five cycles (of 30)', {
         approach: {o: count(data.ratio(data.runs(approach, o), LOSS) < 1) for o in OBJECTIVES}
-        for approach in QUEUE_APPROACHES})
+        for approach in ['dynamic-queue', 'batched', 'hybrid']})
 
 
 def conclusion(data):

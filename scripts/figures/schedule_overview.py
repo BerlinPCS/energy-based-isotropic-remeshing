@@ -39,7 +39,7 @@ ROWS = [
     Row("Repeated cycles", "stagnation").cycles(8),
     Row("Repeated ordered cycles", "stagnation").cycles(8, sorted_phases=True),
     Row("Dynamic queue", "no improving candidate").queue(6.2),
-    Row("Batched processing", "no improving candidate").batch(4, 1.35),
+    Row("Batched queue", "no improving candidate").batch(4, 1.35),
     Row("Hybrid", "no improving candidate").cycles(2).queue(4.6),
     Row("Alternating", "no improving candidate").cycles(1).queue(0.9, knee=True).cycles(1).queue(0.75, knee=True)
     .cycles(1).queue(0.6, knee=True).queue(1.4),

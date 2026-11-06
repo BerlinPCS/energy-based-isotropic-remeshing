@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Every figure and table of the thesis, one module in figures/ per figure or table. Helpers they share are in shared/.
+"""The generated figures and tables of the thesis, one module in figures/ per figure or table. Helpers are in shared/.
 
 A module's generate() takes what it needs:
     generate(out)              the schematic figures of Ch. 2 and 3, which need no data

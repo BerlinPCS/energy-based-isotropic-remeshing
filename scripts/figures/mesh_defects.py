@@ -294,7 +294,7 @@ def polygons(mesh, toward):
         elif k in mesh.get("flip", set()):
             polys.append((9, points, k, True))
         else:
-            polys.append((mesh["layer"][k] if "layer" in mesh else 2 if split else 0, points, k, False))
+            polys.append((2 if split else 0, points, k, False))
     return sorted(polys, key=lambda p: (p[0], sum(dot(q, toward) for q in p[1]) / len(p[1])))
 
 
@@ -361,7 +361,7 @@ def draw(out, panels):
             cut = [q for q in clip(points, 1) if abs(q[2]) < 1e-12]
             samples = [tuple(a + t / 40 * (b - a) for a, b in zip(*cut)) for t in range(41)]
             visible = [not covered(q, lambda m: m == k or m not in mesh["split"]) for q in samples]
-            run = None
+            run = last = None
             for q, seen in zip(samples + [None], visible + [False]):
                 if seen and run is None:
                     run = q

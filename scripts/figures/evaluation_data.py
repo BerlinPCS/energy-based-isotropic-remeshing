@@ -108,7 +108,7 @@ def table_baseline(data):
              r'\sisetup{group-digits=integer, group-minimum-digits=4}', rf'\begin{{tabular}}{{@{{}}l{spec}@{{}}}}',
              r'\toprule',
              r'Mesh & {$T$} & {$|V|$} & {$\bar\lambda$} & {$\theta_{\min}$} & {$\theta_{5\%}$} & '
-             r'{$\sigma_{\mathrm{val}}$} & {$d_{\mathrm{RMS}}$} & {$t$ (ms)} \\', r'\midrule']
+             r'{$\sigma_{\mathrm{val}}$} & {$d_{\mathrm{RMS}}$} & {$t$} \\', r'\midrule']
     for index, group in enumerate(groups):
         if index:
             lines.append(r'\addlinespace[2pt]')
@@ -117,7 +117,8 @@ def table_baseline(data):
               r'\caption{Absolute values of the five-cycle baseline, the reference of all ratios: number of vertices '
               r'$|V|$, average edge loss $\bar\lambda$, smallest angle $\theta_{\min}$ and fifth-percentile angle '
               r'$\theta_{5\%}$ in degrees, valence error $\sigma_{\mathrm{val}}$, surface deviation '
-              r'$d_{\mathrm{RMS}}$ in units of $10^{-3}$, and runtime $t$.}', r'\label{tab:eval-baseline}',
+              r'$d_{\mathrm{RMS}}$ in units of $10^{-3}$ of the bounding box diagonal, and runtime $t$ in milliseconds.}',
+              r'\label{tab:eval-baseline}',
               r'\end{table}']
     return lines
 

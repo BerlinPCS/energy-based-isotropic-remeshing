@@ -56,7 +56,7 @@ python3 scripts/generate_figures.py --data FOLDER --runs FOLDER # into results/
 | Script | Writes |
 |---|---|
 | `run_experiments.py` |`results.csv`, `traces.csv`, `scans.csv`, `inputs.csv`, `failures.csv`, `BUILD_INFO`, and the output meshes.  |
-| `generate_figures.py [NAME ...]` | Every figure and table of the thesis, from one module per figure or table in [`scripts/figures/`](scripts/figures): the schematic figures of Ch. 2 and 3, the plots and tables of Ch. 3, 4 and App. A and B, and with `--runs` the mesh images of Ch. 1 and 4. Helpers they share are in [`scripts/shared/`](scripts/shared). |
+| `generate_figures.py [NAME ...]` | Most figures and table of the thesis, from one module per figure or table in [`scripts/figures/`](scripts/figures): the schematic figures of Ch. 2 and 3, the plots and tables of Ch. 3, 4 and App. A and B, and with `--runs` the mesh images of Ch. 1 and 4. Helpers they share are in [`scripts/shared/`](scripts/shared). |
 
 [`data/`](data) holds the CSV files of the run behind the thesis, without its output meshes, so that all tables and plots
 rebuild without running anything (`python3 scripts/generate_figures.py`). The mesh images and the gallery of App. A are
