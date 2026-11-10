@@ -1,5 +1,7 @@
 /build/
 /results/
+/test_results/
+.python-version
 .DS_Store
 /.venv/
 __pycache__/

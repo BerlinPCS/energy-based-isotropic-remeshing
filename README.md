@@ -1,7 +1,7 @@
 # Energy-Based Isotropic Remeshing
 
 Code of the bachelor's thesis *Energy-Based Isotropic Remeshing* (TU Berlin, Computer Graphics). It implements the
-approaches of Ch. 3 and some of the metrics of Sec. 4.1, and nothing else.
+approaches of Ch. 3 and some of the metrics of Sec. 4.1, and nothing else. Both the scripts and the remesher were only tested on Mac and Linux.
 
 ## Build
 
@@ -49,21 +49,19 @@ meshes of the thesis.
 
 ```sh
 python3 -m pip install -r scripts/requirements.txt
-python3 scripts/run_experiments.py meshes FOLDER                # about 70 minutes and 10 GB.
-python3 scripts/generate_figures.py --data FOLDER --runs FOLDER # into results/
+python3 scripts/run_experiments.py meshes RESULT_DIR # about 70 minutes and 10 GB.
+python3 scripts/generate_figures.py --data RESULT_DIR --runs RESULT_DIR --out OUTPUT_DIR
 ```
 
 | Script | Writes |
 |---|---|
 | `run_experiments.py` |`results.csv`, `traces.csv`, `scans.csv`, `inputs.csv`, `failures.csv`, `BUILD_INFO`, and the output meshes.  |
-| `generate_figures.py [NAME ...]` | Most figures and table of the thesis, from one module per figure or table in [`scripts/figures/`](scripts/figures): the schematic figures of Ch. 2 and 3, the plots and tables of Ch. 3, 4 and App. A and B, and with `--runs` the mesh images of Ch. 1 and 4. Helpers they share are in [`scripts/shared/`](scripts/shared). |
+| `generate_figures.py [NAME ...]` | Generates most figures and table of the thesis, from one module per figure or table in [`scripts/figures/`](scripts/figures). Providing `--runs` generates the figures requiring the output meshes.|
 
 [`data/`](data) holds the CSV files of the run behind the thesis, without its output meshes, so that all tables and plots
-rebuild without running anything (`python3 scripts/generate_figures.py`). The mesh images and the gallery of App. A are
-rendered with `mesh-screenshot` and need a display; they are only made with `--runs`, which also gives the mesh images
-their output meshes, or when named (`generate_figures.py mesh_gallery`).
+rebuild without running anything (`python3 scripts/generate_figures.py`). 
 
-[`scripts/claims.py`](scripts/claims.py) is not part of the pipeline. It shows how each number in the text follows from
+[`scripts/claims.py`](scripts/claims.py) shows how each number in the text follows from
 `data/`, going through the thesis section by section, and prints the numbers when run (`python3 scripts/claims.py`).
 
 ## Licence and mesh credits

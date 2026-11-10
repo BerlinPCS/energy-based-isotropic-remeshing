@@ -26,7 +26,7 @@ def generate(data, out):
         ax.xaxis.tick_top()
         ax.set_xticks(range(8), ['Sum', 'Max.', 'Local avg.', 'Global avg.'] * 2, fontsize=7)
         ax.tick_params(length=0)
-        for index, label in enumerate(['Dynamic', 'Batch']):
+        for index, label in enumerate(['Dynamic', 'Batched']):
             ax.text(1.5 + 4 * index, 1.17, label, transform=ax.get_xaxis_transform(), ha='center', va='bottom')
         ax.axvline(3.5, color='white', lw=2)
         bar = fig.colorbar(image, ax=ax, fraction=.04, pad=.03, label=r'$\bar\lambda$ / baseline')
